@@ -24,6 +24,8 @@ public class HeadScript : MonoBehaviour
         _tickGoTo = 256;
 
         _currentDirection = _localDirection = Direction.up;
+
+        MoveHeadTo();
     }
 
     void Update()
