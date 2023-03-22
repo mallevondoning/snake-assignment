@@ -2,29 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Malle.Util;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance;
+
     [SerializeField]
-    private Tilemap map;
+    public Tilemap Map;
     [SerializeField]
-    private TileBase[] tiles;
+    public TileBase[] Tiles;
 
     private Direction currentDir;
     private Direction lastDir;
 
     private Vector3Int currentPos = Vector3Int.left;
 
-    private Vector3Int offset;
-    private int currentX = 5;
-    private int currentY = 5;
+    private int currentX = DataManager.MaxGridX / 2;
+    private int currentY = DataManager.MaxGridY / 2;
     private float visualHeadRot = 0f;
-    private float visualTailRot = 0f;
-
-    private int gridXMax = 10;
-    private int gridYMax = 10;
-
-    private int length = 3;
 
     private float tickAmount;
     private float tickMax;
@@ -32,23 +28,48 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
+        Init();
+    }
+
+    public void Init()
+    {
+        DataManager.SnakePosList.Clear();
+        DataManager.Score = 0;
+
         currentDir = Direction.up;
         tickAmount = 1;
         tickMax = 256;
+        tickCurrent = 0;
 
-        offset = new Vector3Int(-currentX, -currentY, 0);
-        currentPos = offset + new Vector3Int(currentX, currentY, 0);
+        currentX = DataManager.MaxGridX / 2;
+        currentY = DataManager.MaxGridY / 2;
+        visualHeadRot = 0f;
 
-        map.SetTile(currentPos, tiles[0]);
+        currentPos = DataManager.Offset + new Vector3Int(currentX, currentY, 0);
+
+        Map.SetTile(currentPos, Tiles[0]);
+        DataManager.SnakePosList.Add(currentPos);
+
+        for (int i = 0; i < 2; i++)
+        {
+            int tempY = currentPos.y - i - 1;
+
+            Vector3Int finalPos = new Vector3Int(currentPos.x, tempY, 0);
+            Map.SetTile(finalPos, Tiles[1]);
+
+            DataManager.SnakePosList.Add(finalPos);
+        }
     }
 
     void Update()
     {
         InputHandler();
 
-        if (currentX >= gridXMax) { }
+        if (currentX >= DataManager.MaxGridX) { }
         if (currentX < 0) { }
-        if (currentY >= gridYMax) { }
+        if (currentY >= DataManager.MaxGridY) { }
         if (currentY < 0) { }
 
         if (tickCurrent >= tickMax)
@@ -75,22 +96,40 @@ public class PlayerController : MonoBehaviour
                     break;
             }
 
-
-            currentPos = offset;
+            currentPos = DataManager.Offset;
             currentPos.x += currentX;
             currentPos.y += currentY;
 
-            map.ClearAllTiles();
-            map.SetTile(currentPos, tiles[0]);
+            foreach (var item in DataManager.PelletPosList)
+            {
+                if (currentPos == item)
+                {
+                    DataManager.SnakePosList.Add(DataManager.SnakePosList[DataManager.SnakePosList.Count - 1]);
+                    DataManager.PelletPosList.Remove(item);
+                    DataManager.Score++;
+                    break;
+                }
+            }
+
+            //save down snake body pos
+            List<Vector3Int> tempSnakeList = new List<Vector3Int>();
+            for (int i = DataManager.SnakePosList.Count-2; i > -1; i--)
+                tempSnakeList.Add(DataManager.SnakePosList[i]);
+            tempSnakeList.Add(currentPos);
+            tempSnakeList.Reverse();
+
+            DataManager.SnakePosList = tempSnakeList;
 
             lastDir = currentDir;
+
+            //visual
+            DrawBoard.Draw(Map, Tiles, World.Instance.Tiles);
         }
         else
         {
             tickCurrent += tickAmount;
         }
     }
-
     
     private void InputHandler()
     {
@@ -103,7 +142,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A) && lastDir != Direction.right)
             currentDir = Direction.left;
         
-        map.SetTransformMatrix(currentPos, Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, visualHeadRot)));
+        Map.SetTransformMatrix(currentPos, Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, visualHeadRot)));
     }
 }
 
