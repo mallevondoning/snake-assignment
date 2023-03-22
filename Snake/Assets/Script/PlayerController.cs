@@ -37,9 +37,10 @@ public class PlayerController : MonoBehaviour
     {
         DataManager.SnakePosList.Clear();
         DataManager.Score = 0;
+        DataManager.IsPlayerDead = false;
 
         currentDir = Direction.up;
-        tickAmount = 1;
+        tickAmount = 0;
         tickMax = 256;
         tickCurrent = 0;
 
@@ -66,11 +67,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         InputHandler();
-
-        if (currentX >= DataManager.MaxGridX) { }
-        if (currentX < 0) { }
-        if (currentY >= DataManager.MaxGridY) { }
-        if (currentY < 0) { }
 
         if (tickCurrent >= tickMax)
         {
@@ -120,6 +116,8 @@ public class PlayerController : MonoBehaviour
 
             DataManager.SnakePosList = tempSnakeList;
 
+            DataManager.IsPlayerDead = DeadCheck();
+
             lastDir = currentDir;
 
             //visual
@@ -129,6 +127,33 @@ public class PlayerController : MonoBehaviour
         {
             tickCurrent += tickAmount;
         }
+
+        SpeedCalc();
+    }
+
+    private void SpeedCalc()
+    {
+        if (DataManager.IsPlayerDead)
+            tickAmount = 0;
+        else if (DataManager.IsStarted)
+            tickAmount = 0.75f + (DataManager.Score * 0.05f);
+    }
+
+    public bool DeadCheck()
+    {
+        bool borderCheck = currentX >= DataManager.MaxGridX || currentX < 0 || currentY >= DataManager.MaxGridY || currentY < 0;
+        bool onBody = false;
+
+        for (int i = 1; i < DataManager.SnakePosList.Count; i++)
+        {
+            if (currentPos == DataManager.SnakePosList[i])
+            {
+                onBody = true;
+                break;
+            }
+        }
+
+        return borderCheck || onBody;
     }
     
     private void InputHandler()

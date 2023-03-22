@@ -12,4 +12,7 @@ public static class DataManager
     public static Vector3Int Offset = new Vector3Int(-MaxGridX / 2, -MaxGridY / 2, 0);
 
     public static int Score = 0;
+
+    public static bool IsPlayerDead = false;
+    public static bool IsStarted = false;
 }
