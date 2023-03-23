@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
 
         currentDir = Direction.up;
         tickAmount = 0;
-        tickMax = 256;
+        tickMax = 100;
         tickCurrent = 0;
 
         currentX = DataManager.MaxGridX / 2;
@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour
         if (DataManager.IsPlayerDead)
             tickAmount = 0;
         else if (DataManager.IsStarted)
-            tickAmount = 0.5f + (DataManager.Score * 0.05f);
+            tickAmount = 1.1f + (DataManager.Score * 0.05f);
     }
 
     public bool DeadCheck()
