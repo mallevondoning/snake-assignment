@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour
         if (DataManager.IsPlayerDead)
             tickAmount = 0;
         else if (DataManager.IsStarted)
-            tickAmount = 0.75f + (DataManager.Score * 0.05f);
+            tickAmount = 0.5f + (DataManager.Score * 0.05f);
     }
 
     public bool DeadCheck()

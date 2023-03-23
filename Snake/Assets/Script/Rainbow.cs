@@ -14,6 +14,8 @@ public class Rainbow : MonoBehaviour
 
     private void Update()
     {
-        Color.HSVToRGB(H, 1f, 1f);
+        H += Time.deltaTime;
+
+        highscoreText.color = Color.HSVToRGB(H / scrollTimeInSec % 1, 1f, 1f);
     }
 }
