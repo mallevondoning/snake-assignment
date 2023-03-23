@@ -23,6 +23,8 @@ public class UIScript: MonoBehaviour
     private void Awake()
     {
         restartButton.interactable = false;
+
+        DataManager.Highscore = PlayerPrefs.GetInt("Highscore");
     }
 
     private void Update()
@@ -38,6 +40,7 @@ public class UIScript: MonoBehaviour
             {
                 newHighscoreObj.SetActive(true);
                 DataManager.Highscore = DataManager.Score;
+                PlayerPrefs.SetInt("Highscore", DataManager.Highscore);
             }
         }
         else
@@ -66,6 +69,15 @@ public class UIScript: MonoBehaviour
         restartButton.interactable = false;
 
         DrawBoard.Draw(PlayerController.Instance.Map,PlayerController.Instance.Tiles,World.Instance.Tiles);
+    }
+
+    public void ResetHighscore()
+    {
+        DataManager.Score = 0;
+        DataManager.Highscore = 0;
+        PlayerPrefs.SetInt("Highscore", DataManager.Highscore);
+
+        Restart();
     }
 
     public void Quit()
