@@ -67,4 +67,10 @@ public class UIScript: MonoBehaviour
 
         DrawBoard.Draw(PlayerController.Instance.Map,PlayerController.Instance.Tiles,World.Instance.Tiles);
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+        Debug.Log("Exited the program");
+    }
 }
